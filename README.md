@@ -5,7 +5,7 @@ Ikuti langkah di bawah ini untuk menjalankan file dashboard
 ### Clone repository berikut.
 
 ```bash
-git clone 
+git clone https://github.com/ridopandiSinaga/Analisis-data-with-python.git
 ```
 
 #### Aktifkan virtual environtment : (Pada project ini menggunakan Anaconda)
