@@ -208,9 +208,9 @@ with expander1:
             - Rental numbers are significantly influenced by weather conditions, with clear weather attracting more bike-share rides and worsening conditions leading to a decrease in rentals.
             """
 
-expander2 = st.expander(label="Dataset")
-with expander2:
-       st.write(df_day)
+# expander2 = st.expander(label="Dataset")
+# with expander2:
+#        st.write(df_day)
 
 st.caption('Copyright (c), Some right reserved by Ridopandi Sinaga')
 
