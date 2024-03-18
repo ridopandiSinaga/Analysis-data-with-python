@@ -2,7 +2,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
-plt.style.use('dark_background')
 
 
 # create helper functions
@@ -75,6 +74,8 @@ def create_weatherly_users_df(df_day):
     
     return weatherly_users_df
 
+
+
 def create_hourly_users_df(df_hour):
     hourly_users_df = df_hour.groupby('hour').agg({
     "casual": "sum",
@@ -89,3 +90,29 @@ def create_hourly_users_df(df_hour):
     }, inplace=True)
     
     return hourly_users_df
+
+# def create_weekly_users_df(df_day):
+#     df_day['week'] = df_day['date'].dt.week
+#     weekly_users_df = df_day.groupby('week').agg({
+#         "casual": "sum",
+#         "registered": "sum",
+#         "count": "sum"
+#     })
+#     weekly_users_df.index = ['Week' + str(i) for i in weekly_users_df.index]
+#     weekly_users_df = weekly_users_df.reset_index()
+#     weekly_users_df.rename(columns={
+#         "week": "start_date",
+#         "count": "total_rides",
+#         "casual": "casual_rides",
+#         "registered": "registered_rides"
+#     }, inplace=True)
+    
+#     return weekly_users_df
+
+def create_weekly_users_df(dataset):
+    day = dataset.groupby('weekday').agg({
+    'casual':'sum',
+    'registered':'sum',
+    'count':'sum'})
+    day = day.reindex(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
+    return day

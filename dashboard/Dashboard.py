@@ -3,36 +3,37 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
 import streamlit as st
-plt.style.use('dark_background')
+
 from func import (
-  create_monthly_users_df, create_seasonly_users_df, create_weatherly_users_df, create_hourly_users_df
+  create_monthly_users_df, 
+  create_seasonly_users_df, 
+  create_weatherly_users_df, 
+  create_hourly_users_df,
+  create_weekly_users_df
 )
  
 # load dataset
-
 df_day = pd.read_csv("dashboard/cleaned_bikeshare_day.csv")
 df_hour = pd.read_csv("dashboard/cleaned_bikeshare_hour.csv")
+
 df_day['date'] = pd.to_datetime(df_day['date'])
 df_hour['date'] = pd.to_datetime(df_hour['date'])
+
 st.set_page_config(
     page_title="Capital Bikeshare: Bike-sharing Dashboard",
     page_icon="bar_chart:",
     layout="wide"
     )
 
-
 # make filter components (komponen filter)
-
 min_date = df_day["date"].min()
 max_date = df_day["date"].max()
 
 # ----- SIDEBAR -----
 
 with st.sidebar:
-    # add capital bikeshare logo
-    st.markdown("[![image](https://github.com/ridopandiSinaga/Test/assets/89272004/9f338243-a682-400c-97c1-ea5b2c069fa2)]()")
-
-    st.sidebar.header("Filter:")
+    st.sidebar.markdown("![f10b709994703b4eb2fe68a70cdcb52c](https://github.com/ridopandiSinaga/Analysis-data-with-python/assets/89272004/db55b885-5e61-4f52-be1a-dfc40d8cbd83)")
+    st.sidebar.header("How to use?\n 1. Select the time range of data `Date Filter` that want to visualize. \n2. See the visualization base what you need")
     # mengambil start_date & end_date dari date_input
     start_date, end_date = st.date_input(
         label="Date Filter", min_value=min_date,
@@ -41,17 +42,37 @@ with st.sidebar:
     )
 
 st.sidebar.header("Visit my Profile:")
-
 st.sidebar.markdown("Ridopandi Sinaga")
 
-col1, col2 = st.sidebar.columns(2)
+col1, col2, col3, col4, col5 = st.sidebar.columns(5)
 
 with col1:
-    st.markdown("[![LinkedIn](https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Bug.svg.original.svg)](https://www.linkedin.com/in/ridopandi-sinaga/)")
-with col2:
-    st.markdown("[![Github](https://img.icons8.com/glyph-neue/64/FFFFFF/github.png)](https://github.com/ridopandiSinaga)")
-
-# hubungkan filter dengan main_df
+        st.markdown(
+            "<div style='display: flex;'>"
+            "<a href='https://www.linkedin.com/in/ridopandi-sinaga/' target='_blank'>"
+            "<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/LinkedIn_icon.svg/2048px-LinkedIn_icon.svg.png' width='30'>"
+            "<a/>"
+            "</div>",
+            unsafe_allow_html=True
+        )
+with col2: 
+        st.markdown(
+            "<div style='display: flex;'>"
+            "<a href='https://github.com/ridopandiSinaga' target='_blank'>"
+            "<img src='https://cdn-icons-png.flaticon.com/512/25/25231.png' width='30'>"
+            "<a/>"
+            "</div>",
+            unsafe_allow_html=True
+            )
+with col3: 
+        st.markdown(
+            "<div style='display: flex;'>"
+            "<a href='https://twitter.com/ridopandi__' target='_blank'>"
+            "<img src='https://github.com/ridopandiSinaga/Analysis-data-with-python/assets/89272004/bb55c4b5-ea44-477f-a60e-4c42ae9e7320' width='30'>"
+            "<a/>"
+            "</div>",
+            unsafe_allow_html=True
+            )
 
 main_df_day = df_day[
     (df_day["date"] >= str(start_date)) &
@@ -65,14 +86,20 @@ main_df_hour = df_hour[
 # assign main_df ke helper functions yang telah dibuat sebelumnya
 
 monthly_users_df = create_monthly_users_df(main_df_day)
-seasonly_users_df = create_seasonly_users_df(main_df_day)
+weekly_users_df =  create_weekly_users_df(df_hour)
 hourly_users_df = create_hourly_users_df(main_df_hour)
 weatherly_users_df = create_weatherly_users_df(main_df_day)
+seasonly_users_df = create_seasonly_users_df(main_df_day)
 
 # ----- MAINPAGE -----
 st.title("Bike-Sharing Dashboard")
-st.markdown("![image](https://github.com/ridopandiSinaga/Test/assets/89272004/93c11ad6-c1b2-4ac9-b4e5-3d66d741ca4e)")
+# st.markdown("![f10b709994703b4eb2fe68a70cdcb52c](https://github.com/ridopandiSinaga/Analysis-data-with-python/assets/89272004/db55b885-5e61-4f52-be1a-dfc40d8cbd83)")
 st.markdown("##")
+
+expander3 = st.expander(label="Abstract")
+with expander3:
+       st.markdown("This dataset contains the hourly and daily count of rental bikes between the years 2011 and 2012 in the Capital bike share system with the corresponding weather and seasonal information.\n\nBike sharing systems are new generation of traditional bike rentals where whole process from membership, rental and return back has become automatic. Through these systems, user is able to easily rent a bike from a particular position and return back at another position. Currently, there are about over 500 bike-sharing programs around the world which is composed of over 500 thousands bicycles. Today, there exists great interest in these systems due to their important role in traffic, environmental and health issues.\n\n Apart from interesting real world applications of bike sharing systems, the characteristics of data being generated by these systems make them attractive for the research. Opposed to other transport services such as bus or subway, the duration of travel, departure and arrival position is explicitly recorded in these systems. This feature turns bike sharing system into a virtual sensor network that can be used for sensing mobility in the city. Hence, it is expected that most of important events in the city could be detected via monitoring these data.")
+
 
 col1, col2, col3 = st.columns(3)
 
@@ -94,30 +121,31 @@ fig = px.line(monthly_users_df,
               y=['casual_rides', 'registered_rides', 'total_rides'],
               color_discrete_sequence=["skyblue", "orange", "green"],
               markers=True,
-              title="Monthly Count of Bikeshare Rides").update_layout(xaxis_title='', yaxis_title='Total Rides')
+              title="Monthly Count of Bikeshare Rides").update_layout(xaxis_title='Month', yaxis_title='Total Rides')
 
 st.plotly_chart(fig, use_container_width=True)
 
 
-fig_week = px.bar(df_day, 
-                  x=df_day.index, 
+fig_weekly= px.line(weekly_users_df, 
+                  x=weekly_users_df.index, 
                   y=['casual', 'registered'],
-                 color_discrete_sequence=["blue", "green"],
+                 color_discrete_sequence=["skyblue", "orange", "green"],
                  labels={'value': 'Count', 'weekday': 'Day'},
+                 markers=True,
                  title='Casual vs Registered Count by Weekday',
-                 template='plotly_white',
-                 barmode='group')
+                 ).update_layout(xaxis_title='Day', yaxis_title='Total Rides')
 
 # Line plot untuk 'cnt'
-fig_week.add_scatter(x=df_day.index, y=df_day['count'], mode='lines+markers', name='count', line=dict(color='red'))
-st.plotly_chart(fig_week, use_container_width=True)
+fig_weekly.add_scatter(x=weekly_users_df.index, y=weekly_users_df['count'], mode='lines+markers', name='Count', line=dict(color='red'))
+st.plotly_chart(fig_weekly, use_container_width=True)
+
 # --------
 fig = px.line(hourly_users_df,
               x='hour',
               y=['casual_rides', 'registered_rides'],
               color_discrete_sequence=["skyblue", "orange"],
               markers=True,
-              title='Count of bikeshare rides by hour of day').update_layout(xaxis_title='', yaxis_title='Total Rides')
+              title='Hourly of day count Bikeshare').update_layout(xaxis_title='Hours', yaxis_title='Total Rides')
 
 st.plotly_chart(fig, use_container_width=True)
 # ----------------
@@ -125,8 +153,9 @@ fig1 = px.bar(seasonly_users_df,
               x='season',
               y=['count_rides'],
               color='type_of_rides',
+              barmode='group',
               color_discrete_sequence=["skyblue", "orange", "green"],
-              title='Count of bikeshare rides by season').update_layout(xaxis_title='', yaxis_title='Total Rides')
+              title='Count of bikeshare rides by season').update_layout(xaxis_title='Season', yaxis_title='Total Rides')
 
 
 fig2 = px.bar(weatherly_users_df,
@@ -135,7 +164,7 @@ fig2 = px.bar(weatherly_users_df,
               color='type_of_rides',
               barmode='group',
               color_discrete_sequence=["skyblue", "orange" , "green"],
-              title='Count of bikeshare rides by weather').update_layout(xaxis_title='', yaxis_title='Total Rides')
+              title='Count of bikeshare rides by weather').update_layout(xaxis_title='Weather', yaxis_title='Total Rides')
 
 
 left_column, right_column = st.columns(2)
@@ -143,32 +172,28 @@ left_column.plotly_chart(fig1, use_container_width=True)
 right_column.plotly_chart(fig2, use_container_width=True)
 
 # ------------------------
-
-fig3 = px.scatter(df_day, x='temp', y='count', color='season', title='Clusters of bikeshare rides count by season and temperature')
-fig4 = px.scatter(df_day, x='humidity', y='count', color='season', title='Clusters of bikeshare rides count by season and humidity')
-left_column, right_column = st.columns(2)
-left_column.plotly_chart(fig3, use_container_width=True)
-right_column.plotly_chart(fig4, use_container_width=True)
-
-# ------------------------------
 fig5 = px.pie(df_day, values='count', names='season',
                     title='Percentage of Bike-share Users by Season',
                     color_discrete_sequence=['gold', 'tomato', 'cornflowerblue', 'orchid'],
                     labels={'count': 'Percentage'})
 fig5.update_layout(legend=dict(orientation="v", yanchor="bottom", y=0.8, xanchor="right", x=0.2))
-fig6 = px.bar(df_day, 
-                  x=df_day['season'], 
-                  y=['casual', 'registered'],
-                  color_discrete_sequence=["blue", "green"],
-                  labels={'value': 'Count', 'season': 'Season'},
-                  title='Casual vs Registered Count by Season',
-                  template='plotly_white',
-                  barmode='group')
+
 
 
 left_column, right_column = st.columns((1.5,2))
 left_column.plotly_chart(fig5, use_container_width=True)
-right_column.plotly_chart(fig6, use_container_width=True)
+
+
+
+
+fig3 = px.scatter(df_day, x='temp', y='count', color='season', title='Trend from clustering of bikeshare rides count by season and temperature', trendline="ols").update_layout(xaxis_title='Temperatur', yaxis_title='Total Rides')
+fig4 = px.scatter(df_day, x='humidity', y='count', color='season', title='Trend from clustering of bikeshare rides count by season and humidity', trendline="ols").update_layout(xaxis_title='Humidity', yaxis_title='Total Rides')
+left_column, right_column = st.columns(2)
+left_column.plotly_chart(fig3, use_container_width=True)
+right_column.plotly_chart(fig4, use_container_width=True)
+
+# ------------------------------
+
 
 expander1 = st.expander(label="Insight")
 with expander1:
@@ -183,7 +208,11 @@ with expander1:
             - Rental numbers are significantly influenced by weather conditions, with clear weather attracting more bike-share rides and worsening conditions leading to a decrease in rentals.
             """
 
-st.caption('Copyright (c), Created by Ridopandi Sinaga')
+expander2 = st.expander(label="Dataset")
+with expander2:
+       st.write(df_day)
+
+st.caption('Copyright (c), Some right reserved by Ridopandi Sinaga')
 
 # ----- HIDE STREAMLIT STYLE -----
 hide_st_style = """
