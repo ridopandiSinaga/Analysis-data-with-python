@@ -91,24 +91,6 @@ def create_hourly_users_df(df_hour):
     
     return hourly_users_df
 
-# def create_weekly_users_df(df_day):
-#     df_day['week'] = df_day['date'].dt.week
-#     weekly_users_df = df_day.groupby('week').agg({
-#         "casual": "sum",
-#         "registered": "sum",
-#         "count": "sum"
-#     })
-#     weekly_users_df.index = ['Week' + str(i) for i in weekly_users_df.index]
-#     weekly_users_df = weekly_users_df.reset_index()
-#     weekly_users_df.rename(columns={
-#         "week": "start_date",
-#         "count": "total_rides",
-#         "casual": "casual_rides",
-#         "registered": "registered_rides"
-#     }, inplace=True)
-    
-#     return weekly_users_df
-
 def create_weekly_users_df(dataset):
     day = dataset.groupby('weekday').agg({
     'casual':'sum',
