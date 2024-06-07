@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
 import streamlit as st
+import random
+import time
 
 from func import (
   create_monthly_users_df, 
@@ -208,9 +210,9 @@ with expander1:
             - Rental numbers are significantly influenced by weather conditions, with clear weather attracting more bike-share rides and worsening conditions leading to a decrease in rentals.
             """
 
-# expander2 = st.expander(label="Dataset")
-# with expander2:
-#        st.write(df_day)
+expander2 = st.expander(label="Dataset")
+with expander2:
+       st.write(df_day)
 
 st.caption('Copyright (c), Some right reserved by Ridopandi Sinaga')
 
@@ -219,7 +221,49 @@ hide_st_style = """
                 <style>
                 #MainMenu {visibility: hidden;}
                 footer {visibility: hidden;}
-                header {visibility: hidden;}
+                # header {visibility: hidden;}
                 </style>
                 """
 st.markdown(hide_st_style, unsafe_allow_html=True)
+
+# ---------------------
+# Streamed response emulator
+def response_generator():
+    response = random.choice(
+        [
+            "Hello there! Thank you, I appreciate it.",
+            "Hi, I appreciate it. Thank you",
+            "Thank you mas",
+            "Thank you, I appreciate it",
+            "Thank you, I'll do better"
+        ]
+    )
+    for word in response.split():
+        yield word + " "
+        time.sleep(0.05)
+
+
+st.title("suggestions and critics")
+
+# Initialize chat history
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# Display chat messages from history on app rerun
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+# Accept user input
+if prompt := st.chat_input("What is up?"):
+    # Add user message to chat history
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    # Display user message in chat message container
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
+    # Display assistant response in chat message container
+    with st.chat_message("assistant"):
+        response = st.write_stream(response_generator())
+    # Add assistant response to chat history
+    st.session_state.messages.append({"role": "assistant", "content": response})
